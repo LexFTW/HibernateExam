@@ -14,6 +14,7 @@ public class Initialize {
 		EntityManagerFactory emf = Persistence.createEntityManagerFactory("UsersDB");
 		EntityManager em = emf.createEntityManager();
 		
+		// How to use SELECT with JPA:
 		for (User user : (ArrayList<User>) em.createQuery("SELECT u FROM User u").getResultList()) {
 			System.out.println(user.toString());
 		}
@@ -26,10 +27,12 @@ public class Initialize {
 		user.setUserPassword("Contraseña");
 		user.setPermissionID(1);
 		
-//		em.getTransaction().begin();
-//		em.persist(user);
-//		em.getTransaction().commit();
+		// How to use INSERT with JPA:
+		em.getTransaction().begin();
+		em.persist(user);
+		em.getTransaction().commit();
 		
+		// How to use STORED PROCEDURE with JPA:
 		em.getTransaction().begin();
 		StoredProcedureQuery q = em.createStoredProcedureQuery("insert_user")
 				.registerStoredProcedureParameter(1, String.class, ParameterMode.IN)
@@ -47,6 +50,26 @@ public class Initialize {
 		q.execute();
 		em.getTransaction().commit();
 		
+		// How to use UPDATE with JPA:
+		User userUpdate = em.find(User.class, 1);
+		em.getTransaction().begin();
+		userUpdate.setUserName("Nombre Actualizado");
+		em.getTransaction().commit();
+		
+		
+		// How to use DELETE with JPA:
+		User userDelete = em.find(User.class, 9);
+		em.getTransaction().begin();
+		em.remove(userDelete);
+		em.getTransaction().commit();
+		
+		// How to use SUBQUERY with JPA:
+		ArrayList<User> users = (ArrayList<User>) em.createQuery("SELECT u FROM User u WHERE PermissionID = (SELECT p.permissionID FROM UserPermission p WHERE p.permissionName = 'Administrador')").getResultList();
+		for (User u : users) {
+			System.out.println(u.toString());
+		}
+		
+		// How to use INNER JOIN with JPA:
 	}
 	
 }
